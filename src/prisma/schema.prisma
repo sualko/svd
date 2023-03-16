@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId       Int      @id @default(autoincrement())
+  email        String
+  memberNumber Int
+  type         UserType
+  discount     Boolean
+  briefed      Boolean
+  records      Record[]
+}
+
+model Product {
+  productId     Int     @id @default(autoincrement())
+  baseProductId Int
+  name          String
+  description   String
+  price         Int
+  active        Boolean
+
+  recordProducts RecordProduct[]
+
+  Rule Rule[]
+}
+
+model Record {
+  recordId Int      @id @default(autoincrement())
+  userId   Int
+  date     DateTime
+  user     User     @relation(fields: [userId], references: [userId])
+
+  recordProducts RecordProduct[]
+}
+
+model RecordProduct {
+  recordId  Int
+  productId Int
+  quantity  Int
+
+  record  Record  @relation(fields: [recordId], references: [recordId])
+  product Product @relation(fields: [productId], references: [productId])
+
+  @@id([recordId, productId])
+}
+
+model Rule {
+  ruleId                Int      @id @default(autoincrement())
+  triggerBaseProductId  Int
+  resolvedBaseProductId Int
+  type                  UserType
+  discount              Boolean
+  resolvedBaseProduct   Int
+
+  //triggerBaseProduct Product @relation(fields: [triggerBaseProductId], references: [baseProductId])
+}
+
+enum UserType {
+  GUEST
+  MEMBER
+}
