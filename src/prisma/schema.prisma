@@ -11,18 +11,21 @@ datasource db {
 }
 
 model User {
-  userId       Int      @id @default(autoincrement())
-  email        String
-  memberNumber Int
+  userId       Int      @id @default(autoincrement()) @map("user_id")
+  name         String
+  email        String   @unique
+  memberNumber Int      @map("member_number")
   type         UserType
   discount     Boolean
   briefed      Boolean
   records      Record[]
+
+  @@map("user")
 }
 
 model Product {
-  productId     Int     @id @default(autoincrement())
-  baseProductId Int
+  productId     Int     @id @default(autoincrement()) @map("product_id")
+  baseProductId Int     @unique @default(autoincrement()) @map("base_product_id")
   name          String
   description   String
   price         Int
@@ -30,38 +33,46 @@ model Product {
 
   recordProducts RecordProduct[]
 
-  Rule Rule[]
+  triggers Rule[] @relation(name: "triggerBaseProduct")
+  resolves Rule[] @relation(name: "resolvedBaseProduct")
+
+  @@map("product")
 }
 
 model Record {
-  recordId Int      @id @default(autoincrement())
-  userId   Int
+  recordId Int      @id @default(autoincrement()) @map("record_id")
+  userId   Int      @map("user_id")
   date     DateTime
   user     User     @relation(fields: [userId], references: [userId])
 
   recordProducts RecordProduct[]
+
+  @@map("record")
 }
 
 model RecordProduct {
-  recordId  Int
-  productId Int
+  recordId  Int @map("record_id")
+  productId Int @map("quantity_id")
   quantity  Int
 
-  record  Record  @relation(fields: [recordId], references: [recordId])
+  record  Record  @relation(fields: [recordId], references: [recordId], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [productId])
 
   @@id([recordId, productId])
+  @@map("record_product")
 }
 
 model Rule {
-  ruleId                Int      @id @default(autoincrement())
-  triggerBaseProductId  Int
-  resolvedBaseProductId Int
+  ruleId                Int      @id @default(autoincrement()) @map("rule_id")
+  triggerBaseProductId  Int      @map("trigger_base_product_id")
+  resolvedBaseProductId Int      @map("resolved_base_product_id")
   type                  UserType
   discount              Boolean
-  resolvedBaseProduct   Int
 
-  //triggerBaseProduct Product @relation(fields: [triggerBaseProductId], references: [baseProductId])
+  triggerBaseProduct  Product @relation(name: "triggerBaseProduct", fields: [triggerBaseProductId], references: [baseProductId])
+  resolvedBaseProduct Product @relation(name: "resolvedBaseProduct", fields: [resolvedBaseProductId], references: [baseProductId])
+
+  @@map("rule")
 }
 
 enum UserType {
