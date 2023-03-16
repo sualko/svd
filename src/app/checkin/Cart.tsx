@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, IconButton, TextField } from "@mui/material";
+import { Box, Card, CardContent, CardHeader, IconButton, TextField, Typography } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear"
 import AddIcon from "@mui/icons-material/AddCircle"
 import RemoveIcon from "@mui/icons-material/RemoveCircle"
@@ -12,6 +12,11 @@ type Props = {
 const Cart: React.FC<Props> = ({ lineItems }) => {
     return (
         <Stack direction="column" spacing={3}>
+            {lineItems.length === 0 && <Box p={3}>
+                <Typography variant="body2" color="text.secondary" align="center">
+                    Warenkorb ist leer.
+                </Typography>
+            </Box>}
             {lineItems.map(lineItem =>
                 <Card key={lineItem.base_product_id}>
                     <CardHeader action={

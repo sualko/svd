@@ -10,8 +10,13 @@ export default {
 
 const Template: ComponentStory<typeof Cart> = (args) => <Cart {...args} />;
 
-export const Example = Template.bind({});
-Example.args = {
+export const Empty = Template.bind({});
+Empty.args = {
+    lineItems: []
+}
+
+export const WithItems = Template.bind({});
+WithItems.args = {
     lineItems: [{
         base_product_id: 1,
         name: 'Shoe',
